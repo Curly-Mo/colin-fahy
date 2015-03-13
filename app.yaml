@@ -1,0 +1,27 @@
+application: colin-fahy
+version: 1
+runtime: python27
+api_version: 1
+threadsafe: true
+
+handlers:
+- url: /css
+  static_dir: css
+- url: /images
+  static_dir: images
+- url: (/.*\..*)
+  static_files: static\1
+  upload: static(/.*\..*)
+  secure: always
+  application_readable: true
+- url: /.*
+  script: main.app
+  secure: always
+
+libraries:
+- name: webapp2
+  version: latest
+- name: jinja2
+  version: latest
+- name: numpy
+  version: "1.6.1"
