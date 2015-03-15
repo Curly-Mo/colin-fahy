@@ -12,7 +12,6 @@ handlers:
 - url: (/.*\..*)
   static_files: static\1
   upload: static(/.*\..*)
-  secure: always
   application_readable: true
 - url: /.*
   script: main.app

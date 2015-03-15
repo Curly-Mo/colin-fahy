@@ -1,6 +1,9 @@
 import os
 import re
 import glob
+import urllib
+import urllib2
+import logging
 
 from google.appengine.api import files, app_identity
 import jinja2
@@ -21,6 +24,21 @@ JINJA_ENVIRONMENT = jinja2.Environment(
 
 #         template = JINJA_ENVIRONMENT.get_template('index.html')
 #         self.response.write(template.render(template_values))
+
+class Translate(webapp2.RequestHandler):
+    def get(self):
+        lang = urllib.quote(self.request.get('lang', ''))
+        q = urllib.quote(self.request.get('q', ''))
+
+        tts_url = 'http://translate.google.com/translate_tts?'
+
+        url = tts_url + 'tl=' + lang + '&q=' + q
+
+        # Cheat to get around User-Agent deny
+        req = urllib2.Request(url, headers={'User-Agent' : "Magic Browser"}) 
+        response = urllib2.urlopen(req)
+        data = response.read()
+        self.response.write(data)
 
 class Index(webapp2.RequestHandler):
     def get(self, subdir):
@@ -47,5 +65,6 @@ class Index(webapp2.RequestHandler):
 
 app = webapp2.WSGIApplication([
     #('/', MainPage),
+    ('/tts', Translate),
     ('/([^\.]*/?)', Index),
 ], debug=True)

@@ -3,6 +3,7 @@
     <head>
         <link rel="stylesheet" href="css/main.css">
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+        <script src="js/fft.js"></script>
     </head>
     <body>
       <div class="container">
@@ -64,6 +65,7 @@
           <canvas id="waveform" width="10000" height="150"></canvas>
           <canvas id="spectrum" width="10000" height="150"></canvas>
           <canvas id="spectrogram" width="10000" height="150"></canvas>
+          <canvas id="cepstrum" width="10000" height="150"></canvas>
         </div>
       </div>
     </body>
@@ -92,6 +94,8 @@ var ctx_waveform;
 var scriptProcesser4;
 var waveform_x = 0;
 var waveform_y = 150;
+
+var ctx_cepstrum;
 
 window.addEventListener('load', init, false);
 function init() {
@@ -131,7 +135,7 @@ function initCanvas() {
   gradient.addColorStop(0.35,'#ffff00');
   gradient.addColorStop(0,'#ffffff');
 
-  scriptProcessor = context.createScriptProcessor();
+  scriptProcessor = context.createScriptProcessor(1024);
   scriptProcessor.connect(context.destination);
   analyser.connect(scriptProcessor);
   scriptProcessor.onaudioprocess = drawSpectrum;
@@ -145,7 +149,7 @@ function initCanvas() {
   tempCanvas.width=canvas2.width;
   tempCanvas.height=canvas2.height;
 
-  scriptProcessor2 = context.createScriptProcessor();
+  scriptProcessor2 = context.createScriptProcessor(1024);
   scriptProcessor2.connect(context.destination);
   analyser2.connect(scriptProcessor2);
   scriptProcessor2.onaudioprocess = drawSpectrogram;
@@ -153,7 +157,7 @@ function initCanvas() {
   var canvas3 = document.getElementById('oscilloscope');
   ctx_oscilloscope = canvas3.getContext('2d');
   canvas3.width  = canvas3.offsetWidth;
-  scriptProcessor3 = context.createScriptProcessor();
+  scriptProcessor3 = context.createScriptProcessor(1024);
   scriptProcessor3.connect(context.destination);
   analyser.connect(scriptProcessor3);
   scriptProcessor3.onaudioprocess = drawOscilloscope;
@@ -161,10 +165,18 @@ function initCanvas() {
   var canvas4 = document.getElementById('waveform');
   ctx_waveform = canvas4.getContext('2d');
   canvas4.width  = canvas4.offsetWidth;
-  scriptProcessor4 = context.createScriptProcessor();
+  scriptProcessor4 = context.createScriptProcessor(1024);
   scriptProcessor4.connect(context.destination);
   analyser.connect(scriptProcessor4);
   scriptProcessor4.onaudioprocess = drawWaveform;
+
+  var canvas5 = document.getElementById('cepstrum');
+  ctx_cepstrum = canvas5.getContext('2d');
+  canvas5.width  = canvas5.offsetWidth;
+  scriptProcessor5 = context.createScriptProcessor(1024);
+  scriptProcessor5.connect(context.destination);
+  analyser.connect(scriptProcessor5);
+  scriptProcessor5.onaudioprocess = drawCepstrum;
 }
 
 function drawOscilloscope() {
@@ -269,6 +281,25 @@ function drawSpectrogram() {
   ctx_spectrogram.setTransform(1, 0, 0, 1, 0, 0);
 };
 
+function drawCepstrum() {
+  if (!is_playing) {
+      return;
+  }
+  var array =  new Uint8Array(analyser.frequencyBinCount);
+  analyser.getByteFrequencyData(array);
+
+  array = dft(array);
+
+  ctx_cepstrum.clearRect(0, 0, ctx_cepstrum.canvas.width, ctx_cepstrum.canvas.height);
+  ctx_cepstrum.fillStyle=gradient;
+  for ( var i = 0; i < (array.length); i++ ){
+    var value = ctx_cepstrum.canvas.height*array[i]/256;
+
+    var binWidth = ctx_cepstrum.canvas.width/analyser.frequencyBinCount;
+    ctx_cepstrum.fillRect(i*binWidth,ctx_cepstrum.canvas.height,binWidth*3/4,-value);
+  }
+};
+
 $(document).ready(function(){
 
   $('#file_form').hide();  
@@ -284,7 +315,7 @@ $(document).ready(function(){
 
 
   $('#file_form').submit(function () {
-    // var file = $("#local_file").val();
+    // var file = $("#`cal_file").val();
     // var audio_object = window.createObjectURL(file); 
     // var audio = document.createElement('audio');
     // audio.setAttribute('src', file);
@@ -307,7 +338,6 @@ $(document).ready(function(){
 
     xhr.onload = function(e) {
       if (this.status == 200) {
-        console.log(xhr.response);
         context.decodeAudioData(xhr.response, start_audio);
       }
     };
