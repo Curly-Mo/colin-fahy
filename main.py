@@ -38,6 +38,8 @@ class Translate(webapp2.RequestHandler):
         req = urllib2.Request(url, headers={'User-Agent' : "Magic Browser"}) 
         response = urllib2.urlopen(req)
         data = response.read()
+
+        self.response.headers.add_header("Access-Control-Allow-Origin", "*")
         self.response.write(data)
 
 class Index(webapp2.RequestHandler):

@@ -307,7 +307,6 @@ $(document).ready(function(){
 
     xhr.onload = function(e) {
       if (this.status == 200) {
-        console.log(xhr.response);
         context.decodeAudioData(xhr.response, start_audio);
       }
     };
