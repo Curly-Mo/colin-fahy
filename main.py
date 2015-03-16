@@ -27,12 +27,14 @@ JINJA_ENVIRONMENT = jinja2.Environment(
 
 class Translate(webapp2.RequestHandler):
     def get(self):
-        lang = urllib.quote(self.request.get('lang', ''))
-        q = urllib.quote(self.request.get('q', ''))
+        lang = self.request.get('lang', '')
+        q = self.request.get('q', '')
 
         tts_url = 'http://translate.google.com/translate_tts?'
 
-        url = tts_url + 'tl=' + lang + '&q=' + q
+        if not lang:
+            lang = 'en'
+        url = tts_url + 'tl=' + urllib.quote(lang) + '&q=' + urllib.quote(q)
 
         # Cheat to get around User-Agent deny
         req = urllib2.Request(url, headers={'User-Agent' : "Magic Browser"}) 
