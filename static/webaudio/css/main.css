@@ -54,7 +54,9 @@ textarea:focus, input:focus, select:focus{
 .button {
   display: inline-block;
   margin: 10px;
-  padding: 5px 30px;
+  width: 85px;
+  height: 65px;
+  /*padding: 5px 30px;*/
   font-size: 30px;
   font-family: "Bitter",serif;
   line-height: 1.8;

@@ -5,7 +5,9 @@ function dft(buffer){
  		var value = complex_buffer[k];
  		magnitude_buffer[k] = Math.sqrt(Math.pow(value[0], 2) + Math.pow(value[1], 2));
  	}
- 	max = Math.max.apply(Math, magnitude_buffer);
+  //Slice to ignore bin zero (DC content) when scaling
+ 	//max = Math.max.apply(Math, magnitude_buffer.slice(1));
+  max = Math.max.apply(Math, magnitude_buffer);
  	for(var k=0; k < magnitude_buffer.length; k++ ) {
  		var value = magnitude_buffer[k];
  		magnitude_buffer[k] = magnitude_buffer[k]*256/max;

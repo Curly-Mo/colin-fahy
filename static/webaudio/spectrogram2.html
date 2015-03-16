@@ -15,7 +15,7 @@
           <div id="form-div">
           <form id="file_form" class="form">
             <input id="local_file" name="local_file" type="file">
-            <div><input class="button" type="submit" value="Play" style="float: right;"></div>
+            <div><input id="file_submit" class="button" type="submit" value="&#9658;" style="float: right;"></div>
           </form>
           <form id="tts_form" class="form">
               <label for="lyrics">Lyrics</label>
@@ -38,7 +38,7 @@
                 <option value="sv">Swedish</option>
                 <option value="de">German</option>
               </select>
-              <input class="button" type="submit" value="Play" style="float: right;">
+              <input id="tts_submit" class="button" type="submit" value="&#9658;" style="float: right;">
               </div>
           </form>
           <div>
@@ -159,7 +159,7 @@ function initCanvas() {
   canvas3.width  = canvas3.offsetWidth;
   scriptProcessor3 = context.createScriptProcessor(1024);
   scriptProcessor3.connect(context.destination);
-  analyser.connect(scriptProcessor3);
+  analyser2.connect(scriptProcessor3);
   scriptProcessor3.onaudioprocess = drawOscilloscope;
 
   var canvas4 = document.getElementById('waveform');
@@ -167,21 +167,21 @@ function initCanvas() {
   canvas4.width  = canvas4.offsetWidth;
   scriptProcessor4 = context.createScriptProcessor(1024);
   scriptProcessor4.connect(context.destination);
-  analyser.connect(scriptProcessor4);
+  analyser2.connect(scriptProcessor4);
   scriptProcessor4.onaudioprocess = drawWaveform;
 
   var canvas5 = document.getElementById('cepstrum');
   ctx_cepstrum = canvas5.getContext('2d');
   canvas5.width  = canvas5.offsetWidth;
-  scriptProcessor5 = context.createScriptProcessor(1024);
+  scriptProcessor5 = context.createScriptProcessor(2048);
   scriptProcessor5.connect(context.destination);
   analyser.connect(scriptProcessor5);
   scriptProcessor5.onaudioprocess = drawCepstrum;
 }
 
 function drawOscilloscope() {
-  var array = new Uint8Array(analyser.frequencyBinCount);
-  analyser.getByteTimeDomainData(array);
+  var array = new Uint8Array(analyser2.frequencyBinCount);
+  analyser2.getByteTimeDomainData(array);
   var canvas = ctx_oscilloscope.canvas;
   ctx_oscilloscope.clearRect(0,0,canvas.width,canvas.height);
 
@@ -190,7 +190,7 @@ function drawOscilloscope() {
   ctx_oscilloscope.beginPath();
   for (var i = 0; i < array.length; i++) {
       var value = array[i] / 256;
-      x = i*canvas.width/analyser.frequencyBinCount;
+      x = i*canvas.width/analyser2.frequencyBinCount;
       y = value * canvas.height;
       if(i === 0) {
         ctx_oscilloscope.moveTo(x, y);
@@ -198,7 +198,7 @@ function drawOscilloscope() {
         ctx_oscilloscope.lineTo(x, y);
       }
   }
-  ctx_oscilloscope.lineTo(canvas.width, canvas.height/2);
+  //ctx_oscilloscope.lineTo(canvas.width, canvas.height/2);
   ctx_oscilloscope.stroke();
 };
 
@@ -207,8 +207,8 @@ function drawWaveform() {
   //if (document.getElementById('player').paused){
     return;
   }
-  var array = new Uint8Array(analyser.frequencyBinCount);
-  analyser.getByteTimeDomainData(array);
+  var array = new Uint8Array(analyser2.frequencyBinCount);
+  analyser2.getByteTimeDomainData(array);
   var canvas = ctx_waveform.canvas;
 
   //audioDuration = document.getElementById('player').duration;
@@ -320,32 +320,41 @@ $(document).ready(function(){
     // var audio = document.createElement('audio');
     // audio.setAttribute('src', file);
     // audio.play();
-    var audio = document.getElementById('player');
-    audio.currentTime=0;
-    audio.play();
+    // var audio = document.getElementById('player');
+    // audio.currentTime=0;
+    // audio.play();
+    if (is_playing){
+      source.stop();
+    } else {
+      start_audio(audio_buffer, 0);
+    }
     return false;
   });
 
 
   $('#tts_form').submit(function () {
-    var lang = $.trim($("#language").val());
-    var lyrics = $.trim($("#lyrics").val());
+    if (is_playing){
+      source.stop();
+    } else {
+      var lang = $.trim($("#language").val());
+      var lyrics = $.trim($("#lyrics").val());
 
-    var url = '/tts?' + "&lang=" + encodeURIComponent(lang) + "&q=" + encodeURIComponent(lyrics);
-    var xhr = new XMLHttpRequest();
-    xhr.open('GET', url, true);
-    xhr.responseType = 'arraybuffer';
+      var url = '/tts?' + "&lang=" + encodeURIComponent(lang) + "&q=" + encodeURIComponent(lyrics);
+      var xhr = new XMLHttpRequest();
+      xhr.open('GET', url, true);
+      xhr.responseType = 'arraybuffer';
 
-    xhr.onload = function(e) {
-      if (this.status == 200) {
-        context.decodeAudioData(xhr.response, start_audio);
-      }
-    };
-    xhr.send();
+      xhr.onload = function(e) {
+        if (this.status == 200) {
+          context.decodeAudioData(xhr.response, start_audio);
+        }
+      };
+      xhr.send();
 
-    // var audio = document.getElementById('player');
-    // audio.setAttribute('src', src);
-    // audio.play();
+      // var audio = document.getElementById('player');
+      // audio.setAttribute('src', src);
+      // audio.play();
+    }
     return false;
   });
 
@@ -389,7 +398,9 @@ document.getElementById('local_file').addEventListener('change', handleFileSelec
 function loopClick(checkboxElement){
   //var audio = document.getElementById('player');
   //audio.loop = checkboxElement.checked;
-  source.loop = checkboxElement.checked;
+  if (source){
+    source.loop = checkboxElement.checked;
+  }
 }
 
 function fftSizeChange(selectElement){
@@ -405,14 +416,23 @@ function start_audio(audioBuffer, start_time){
   if (typeof start_time == 'undefined') {
     start_time = 0;
   }
+  if (start_time == 0){
+    waveform_x = 0;
+    ctx_waveform.clearRect(0,0,ctx_waveform.canvas.width,ctx_waveform.canvas.height);
+  }
   source = context.createBufferSource();
   source.connect(analyser);
   source.connect(analyser2);
   source.buffer = audio_buffer;
   source.start(0,start_time);
   is_playing = true;
+  $('.button').val('\u00A0\u258C\u258C');
+  if ($('#loop').is(":checked")){
+      source.loop = true;
+  }
   source.onended = function() {
     is_playing = false;
+    $('.button').val('\u25BA');
   }
 }
 </script>
