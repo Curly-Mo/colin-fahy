@@ -1,0 +1,113 @@
+<!DOCTYPE HTML>
+<html>
+    <head>
+      <link rel="stylesheet" href="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css" />
+      <link rel="stylesheet" href="css/main.css" />
+      <script src="http://code.jquery.com/jquery-1.11.1.min.js"></script>
+      <script src="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
+      <script src="http://connect.soundcloud.com/sdk.js"></script>
+    </head>
+    <body>
+      <div data-role='page'>
+          <form id='main-form'>
+            <label for='searchbar'>Search:</label>
+            <input type="text" name="searchbar" id="searchbar" data-mini="true" value='Bonobo' onClick="this.select();">
+          </form>
+          <audio id='player' controls></audio>
+          <ul id='tracks' data-role="listview" data-icon="false"></ul>
+          <image src='images/soundcloud.png' style='float:right;'/>
+      </div> 
+
+      <script>
+      var client_id = 'd0304b5dcd5cc102a0240364ac6edc9c';
+      $(function () {
+        SC.initialize({
+          client_id: client_id
+        });
+
+        $('#tracks').on('click', 'li', function() {
+          $(this).addClass('playing').siblings().removeClass('playing');
+          $(this).focus();
+          $('#player').attr('src', $(this).attr('data-src'));
+          $('#player').trigger('play');
+
+          if ($(this).is(':hidden')){
+            $(this).slideDown();
+          }
+          var prev = $(this).prev()
+          while (prev.length && prev.is(':visible')){
+            prev.slideUp();
+            prev = prev.prev()
+          }
+
+        });
+
+        $('#main-form').submit(function(){
+          LoadTracks();
+          return false;
+        });
+
+        var LoadTracks = function() {
+          $('#tracks').empty();
+
+          var q = $('#searchbar').val();
+          SC.get('/tracks', { q: q, streamable: 'true'}, function(tracks) {
+            for(var i=0; i<tracks.length; i++){
+              var track = tracks[i];
+              var stream_url = track.stream_url + '?client_id=' + client_id;
+              var artwork_url ='';
+              if (track.artwork_url != null){
+                artwork_url = track.artwork_url;
+              }
+
+              $("<li "
+                + "data-src='"+stream_url+"'>"
+                +"<a href='#'>"
+                +"<img src="+artwork_url+">"
+                +"<h3>"+track.title+"</h3>"
+                +"</a></li>")
+                .appendTo('#tracks');
+            }
+            $("#tracks").listview('refresh');
+            $('#tracks').children(":first").click();
+          });
+        };
+
+        $('#player').on('ended', function() {
+            var next = $('li.playing').next();
+            if (next.length) next.click();
+        });
+
+        $(document).keydown(function(e) {
+          if ($(e.target).is('input, textarea')) {
+            return;   
+          }
+          var unicode = e.charCode ? e.charCode : e.keyCode;
+             // right arrow
+          if (unicode == 39) {
+            var next = $('li.playing').next();
+            if (next.length) next.click();
+            // back arrow
+          } else if (unicode == 37) {
+            var prev = $('li.playing').prev();
+            if (prev.length) prev.click();
+            // spacebar
+          } else if (unicode == 32) {
+            e.preventDefault();
+            player = document.getElementById('player')
+            if (player.paused){
+              player.play();
+            }else{
+              player.pause();
+            }
+          }
+        })  
+
+        LoadTracks();
+        $('#searchbar').click();
+      });
+      </script>
+    </body>
+</html>
+
+
