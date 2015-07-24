@@ -1,0 +1,3 @@
+[submodule "static/webaudio/visualaudio"]
+	path = static/webaudio/visualaudio
+	url = https://github.com/Curly-Mo/visualaudio.git
