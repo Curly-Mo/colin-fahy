@@ -1,3 +1,6 @@
 [submodule "static/webaudio/visualaudio"]
 	path = static/webaudio/visualaudio
 	url = https://github.com/Curly-Mo/visualaudio.git
+[submodule "static/webaudio/synthonic"]
+	path = static/webaudio/synthonic
+	url = https://github.com/Curly-Mo/synthonic.git
