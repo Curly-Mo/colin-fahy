@@ -4,3 +4,6 @@
 [submodule "static/webaudio/synthonic"]
 	path = static/webaudio/synthonic
 	url = https://github.com/Curly-Mo/synthonic.git
+[submodule "static/webaudio/binaural"]
+	path = static/webaudio/binaural
+	url = https://github.com/Curly-Mo/binaural.js.git

@@ -1,14 +1,10 @@
 import os
-import re
 import glob
-import urllib
-import urllib2
-import logging
 
-from google.appengine.api import files, app_identity
 import jinja2
 import webapp2
-from webapp2_extras.routes import RedirectRoute
+
+from webaudio import views as webaudio_views
 
 
 JINJA_ENVIRONMENT = jinja2.Environment(
@@ -25,24 +21,6 @@ JINJA_ENVIRONMENT = jinja2.Environment(
 #         template = JINJA_ENVIRONMENT.get_template('index.html')
 #         self.response.write(template.render(template_values))
 
-class Translate(webapp2.RequestHandler):
-    def get(self):
-        lang = self.request.get('lang', '')
-        q = self.request.get('q', '')
-
-        tts_url = 'http://translate.google.com/translate_tts?'
-
-        if not lang:
-            lang = 'en'
-        url = tts_url + 'tl=' + urllib.quote(lang) + '&q=' + urllib.quote(q)
-
-        # Cheat to get around User-Agent deny
-        req = urllib2.Request(url, headers={'User-Agent' : "Magic Browser"}) 
-        response = urllib2.urlopen(req)
-        data = response.read()
-
-        self.response.headers.add_header("Access-Control-Allow-Origin", "*")
-        self.response.write(data)
 
 class Index(webapp2.RequestHandler):
     def get(self, subdir):
@@ -56,11 +34,15 @@ class Index(webapp2.RequestHandler):
             if path.startswith('/'):
                 path = path[1:]
             full_path = os.path.join('/', subdir, path)
+
+            if path == 'index.html':
+                self.redirect(full_path)
+
             if '.' in path:
-                files.append({'text':path, 'path':full_path, 'dir':False})
+                files.append({'text': path, 'path': full_path, 'dir': False})
             else:
-                dirs.append({'text':path, 'path':full_path, 'dir':True})
-        dirs.insert(0, {'text':'..', 'path':os.path.join('/', subdir, '..'), 'dir':True})
+                dirs.append({'text': path, 'path': full_path, 'dir': True})
+        dirs.insert(0, {'text': '..', 'path': os.path.join('/', subdir, '..'), 'dir': True})
         template_values = {
             'links': dirs + files,
         }
@@ -69,6 +51,6 @@ class Index(webapp2.RequestHandler):
 
 app = webapp2.WSGIApplication([
     #('/', MainPage),
-    ('/tts', Translate),
+    ('/tts', webaudio_views.Translate),
     ('/([^\.]*/?)', Index),
 ], debug=True)
