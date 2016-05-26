@@ -7,3 +7,6 @@
 [submodule "static/webaudio/binaural"]
 	path = static/webaudio/binaural
 	url = https://github.com/Curly-Mo/binaural.js.git
+[submodule "static/webaudio/webvr"]
+	path = static/webaudio/webvr
+	url = https://github.com/Curly-Mo/webvr.git
