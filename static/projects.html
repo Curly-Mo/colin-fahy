@@ -1,0 +1,104 @@
+<div class="portfolio">
+  <!-- PORTFOLIO NAVIGATION -->
+  <ul id="filters" class="clearfix">
+    <li><span class="filter active" data-filter="all">All</span></li>
+    <li><span class="filter" data-filter="web-audio">Web Audio</span></li>
+    <li><span class="filter" data-filter="mir">Music Informatics</span></li>
+  </ul>
+
+  <!-- PORTFOLIO THUMBS -->
+  <div id="portfoliolist">
+
+    <!-- THUMB -->
+    <div class="portfolio web-audio">
+      <div class="portfolio-wrapper">
+        <a class="open" href="#projects/bandwagon">
+          <img src="projects/thumbs/bandwagon.png" alt"BandWagon">
+        </a>
+        <div class="label">
+          <div class="label-text">
+            <a class="text-title">BandWagon</a>
+            <span class="text-category">Music Radio</span>
+          </div>
+          <div class="label-bg"></div>
+        </div>
+      </div> <!--/portfoliowrapper-->
+     </div>
+    <!-- /THUMB -->
+
+    <!-- THUMB -->
+    <div class="portfolio web-audio">
+      <div class="portfolio-wrapper">
+        <a class="open" href="#projects/visualaudio">
+          <img src="projects/thumbs/visualaudio.png" alt"Visual Audio">
+        </a>
+        <div class="label">
+          <div class="label-text">
+            <a class="text-title">Visual Audio</a>
+            <span class="text-category">Web Audio</span>
+          </div>
+          <div class="label-bg"></div>
+        </div>
+      </div> <!--/portfoliowrapper-->
+     </div>
+    <!-- /THUMB -->
+
+    <!-- THUMB -->
+    <div class="portfolio mir">
+      <div class="portfolio-wrapper">
+        <a class="open" href="#projects/visualaudio">
+          <img src="projects/thumbs/visualaudio.png" alt"Visual Audio">
+        </a>
+        <div class="label">
+          <div class="label-text">
+            <a class="text-title">Visual Audio</a>
+            <span class="text-category">Web Audio</span>
+          </div>
+          <div class="label-bg"></div>
+        </div>
+      </div> <!--/portfoliowrapper-->
+     </div>
+    <!-- /THUMB -->
+
+  </div> <!-- /PORTFOLIO THUMBS -->
+
+</div>
+
+<script type="type/javascript">
+$.extend($.easing,
+{
+    easeOutQuad: function (x, t, b, c, d) {
+        return -c *(t/=d)*(t-2) + b;
+    },
+    easeInQuad: function (x, t, b, c, d) {
+        return c*(t/=d)*t + b;
+    },
+});
+$(function () {
+   var filterList = {
+      init: function () {
+        $('#portfoliolist').mixitup({
+          targetSelector: '.portfolio',
+          filterSelector: '.filter',
+          effects: ['fade'],
+          easing: 'easeInQuad',
+          onMixEnd: filterList.hoverEffect()
+        });
+      },
+
+      hoverEffect: function () {
+        $('#portfoliolist .portfolio').hover(
+          function () {
+            $(this).find('.label').stop().animate({bottom: 0}, 200, 'easeOutQuad');
+            $(this).find('img').stop().animate({top: -30}, 500, 'easeOutQuad');
+          },
+          function () {
+            $(this).find('.label').stop().animate({bottom: -40}, 200, 'easeInQuad');
+            $(this).find('img').stop().animate({top: 0}, 300, 'easeOutQuad');
+          }
+        );
+      }
+    };
+    filterList.init();
+});
+</script>

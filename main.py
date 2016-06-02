@@ -5,6 +5,7 @@ import jinja2
 import webapp2
 
 from webaudio import views as webaudio_views
+import views
 
 
 JINJA_ENVIRONMENT = jinja2.Environment(
@@ -49,8 +50,10 @@ class Index(webapp2.RequestHandler):
         template = JINJA_ENVIRONMENT.get_template('index.html')
         self.response.write(template.render(template_values))
 
+
 app = webapp2.WSGIApplication([
     #('/', MainPage),
     ('/tts', webaudio_views.Translate),
+    ('/send_mail', views.Email),
     ('/([^\.]*/?)', Index),
 ], debug=True)

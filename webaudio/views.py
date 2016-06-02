@@ -8,11 +8,11 @@ class Translate(webapp2.RequestHandler):
         lang = self.request.get('lang', '')
         q = self.request.get('q', '')
 
-        tts_url = 'http://translate.google.com/translate_tts?'
+        tts_url = 'http://translate.google.com/translate_tts?&client=tw-ob'
 
         if not lang:
             lang = 'en'
-        url = tts_url + 'tl=' + urllib.quote(lang) + '&q=' + urllib.quote(q)
+        url = tts_url + '&tl=' + urllib.quote(lang) + '&q=' + urllib.quote(q)
 
         # Cheat to get around User-Agent deny
         req = urllib2.Request(url, headers={'User-Agent' : "Magic Browser"})
