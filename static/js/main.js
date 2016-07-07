@@ -8,7 +8,7 @@ function load_page(){
     var url = location.hash.slice(1) || 'projects';
     var path = url + '.html';
    	var content = document.getElementById('content');
-    content.style.overflow = 'hidden';
+    content.parentElement.style.overflow = 'hidden';
     // Remove current content
     var div = (content.firstElementChild||content.firstChild);
     if(div != null){
@@ -31,7 +31,7 @@ function load_page(){
             }
             div.classList.remove('off-right');
             div.addEventListener(transitionend, function(e){
-                content.style.overflow = 'auto';
+                content.parentElement.style.overflow = 'auto';
             });
     	}
    	}

@@ -9,13 +9,9 @@ class Email(webapp2.RequestHandler):
         body = self.request.get('message', '')
 
         message = mail.EmailMessage()
-        message.sender = address
-        message.headers = {'On-Behalf-Of': '{} <{}>'.format(name, address)}
-        message.subject = 'Email form (cfahy.com)'
+        message.sender = '{} <{}>'.format(name, 'colin-fahy@appspot.gserviceaccount.com')
+        message.subject = 'Email on behalf of: {}, {}'.format(name, address)
         message.to = 'colin@cfahy.com'
-        body = """
-        this is a test
-        """
         message.body = body
 
         message.send()

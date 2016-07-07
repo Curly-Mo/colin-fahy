@@ -24,7 +24,7 @@ color:#e95a44
 .main {
 margin:0 0 0 300px;
 height:100%;
-
+overflow:auto;
 }
 .wrapper{
 height: 100%;	
@@ -110,12 +110,12 @@ display:block;
 padding:0 0 0 20px
 }
 
-.nav li {
+.nav > li {
 display:block;
 overflow:hidden
 }
 
-.nav li a {
+.nav > li > a {
 display:block;
 font-size:16px;
 color:#dce0df;
@@ -129,7 +129,7 @@ background:#262d33;
 transition:background .3s ease-in
 }
 
-.nav li a:hover {
+.nav > li > a:hover {
 background:#4d4e53
 }
 
@@ -345,14 +345,14 @@ position:absolute;
 top:60px;
 bottom:0;
 overflow:visible;
-max-width:70%;
+max-width:60%;
 padding:1%
 }
 
 .contentright {
 position:absolute;
 top:60px;
-left:70%;
+left:60%;
 max-width:300px;
 width:28%
 }
@@ -799,10 +799,6 @@ min-height:100%;
 background:#dce0df
 }
 
-.social {
-display:none
-}
-
 .logo {
 display:none
 }
@@ -858,7 +854,7 @@ width:100%
 
 @media only screen and (min-width: 480px) and (max-width: 767px) {
 .container {
-width:70%
+width:60%
 }
 }
 
@@ -897,6 +893,13 @@ height:0
 }
 
 /* STUFF FOR THE THING */
+.subheading {
+	font-family:'Roboto Slab', 'Roboto', serif;
+	color:#444444;
+	font-size: 18px;
+  font-style: italic;
+  font-weight: normal;
+}
 
 .foliopage{	
 max-width: 1280px;
@@ -916,7 +919,7 @@ max-width: 1280px;
 
 .leftbox{
 	position: relative;
-	width: 70%;
+	width: 60%;
 	display: inline-block;
 	vertical-align: top;
 }
@@ -928,7 +931,7 @@ max-width: 1280px;
 }
 .description{
 	position: relative;
-	width: 29%;
+	width: 39%;
 	display: inline-block;
 	vertical-align: top;
 	padding-left: 10px;
@@ -938,6 +941,14 @@ max-width: 1280px;
 	color:#e95a44;
 	margin: 0;
 	font-size: 18px;
+}
+.description h3{
+	font-family:'Roboto Slab', 'Roboto', serif;
+	color:#444444;
+	margin: 0;
+	font-size: 12px;
+  font-style: italic;
+  font-weight: normal;
 }
 
 .backnext{	
